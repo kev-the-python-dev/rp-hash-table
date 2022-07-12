@@ -16,12 +16,10 @@ class hashTable:
 
     def __setitem__(self, key, value):
         # Keep max_capacity fixed
-        index = hash(key) % len(self)
-        self.values[index] = value
+        self.values[self._index(key)] = value
 
     def __getitem__(self, key):
-        index = hash(key) % len(self)
-        value = self.values[index]
+        value = self.values[self._index(key)]
         if value is BLANK: # We use 'is' keyword t compare identity and not values 
             raise KeyError(key)
         return value
@@ -39,3 +37,10 @@ class hashTable:
             return self[key]
         except KeyError:
             return default
+
+    def __delitem__(self, key):
+        # Taking advantage of mutator method
+        self[key] = BLANK
+
+    def _index(self, key):
+        return hash(key) % len(self)

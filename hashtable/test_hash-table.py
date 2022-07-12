@@ -90,3 +90,15 @@ def test_should_get_value(hash_table):
 
 def test_should_get_none_when_key_missing(hash_table):
     assert hash_table.get('Missing_Key') is None
+
+def test_should_delete_key_value_pair(hash_table):
+    assert 'Hola' in hash_table
+    assert 'Hello' in hash_table.values
+
+    del hash_table['Hola']
+
+    assert 'Hola' not in hash_table
+    assert 'Hello' not in hash_table.values
+
+    # Ensure Hash deletion does not shrink overall hash table
+    assert len(hash_table) == 100

@@ -30,7 +30,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/home/kingcobrapy/Desktop/code/src/realpython/hashtable/.venv"
+set -gx VIRTUAL_ENV "/home/kingcobrapy/Desktop/code/src/realpython/rp-hash-table/hashtable/.venv"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH

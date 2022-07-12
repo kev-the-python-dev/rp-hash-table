@@ -1,4 +1,4 @@
-#!/home/kingcobrapy/Desktop/code/src/realpython/hashtable/.venv/bin/python3
+#!/home/kingcobrapy/Desktop/code/src/realpython/rp-hash-table/hashtable/.venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

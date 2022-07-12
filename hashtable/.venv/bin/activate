@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="/home/kingcobrapy/Desktop/code/src/realpython/hashtable/.venv"
+VIRTUAL_ENV="/home/kingcobrapy/Desktop/code/src/realpython/rp-hash-table/hashtable/.venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
