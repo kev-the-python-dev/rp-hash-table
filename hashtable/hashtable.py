@@ -4,25 +4,29 @@
 3. Dynamically resize hash table
 4. Calculate load factor
 '''
+from typing import NamedTuple, Any
 
-BLANK = object() # To prevent allowing None values to be used for hashTable object upon creation
+class Pair(NamedTuple):
+    key: Any
+    value: Any
+#None = object() # To prevent allowing None pair to be used for hashTable object upon creation
 
 class hashTable:
     def __init__(self, max_capacity):
-        self.values = max_capacity * [BLANK] # Quickesy way to populate list with given values
+        self._pair = max_capacity * [None] # Quickesy way to populate list with given pair
 
     def __len__(self):
-        return len(self.values)
+        return len(self._pair)
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, pair):
         # Keep max_capacity fixed
-        self.values[self._index(key)] = value
+        self._pair[self._index(key)] = Pair(key, pair)
 
     def __getitem__(self, key):
-        value = self.values[self._index(key)]
-        if value is BLANK: # We use 'is' keyword t compare identity and not values 
+        pairs = self._pair[self._index(key)]
+        if pairs is None: # We use 'is' keyword t compare identity and not pair 
             raise KeyError(key)
-        return value
+        return pairs.value
 
     def __contains__(self, key):
         try:
@@ -40,7 +44,23 @@ class hashTable:
 
     def __delitem__(self, key):
         # Taking advantage of mutator method
-        self[key] = BLANK
-
+        if key in self:
+            self._pair[self._index(key)] = None
+        else:
+            raise KeyError(key)
+    # Don't remove otherwise copies may just be references to same object vs. their own object
+    @property
+    def values(self):
+        return [val_pair.value for val_pair in self.pair]
+    
+    @property
+    def pair(self):
+        return {val_pair for val_pair in self._pair if val_pair} # creates separate list (needed to create different object from copy)
+    @property
+    def keys(self):
+        return {val_pair.key for val_pair in self.pair} # Ensure no keys are same name
+    
     def _index(self, key):
         return hash(key) % len(self)
+
+    

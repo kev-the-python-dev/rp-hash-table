@@ -4,10 +4,11 @@
 3. Dynamically resize hash table
 4. Calculate load factor
 '''
-from re import M
-import pytest
 
-from hashtable import hashTable, BLANK # BLANK needed tomark slots as empty
+import pytest
+from pytest_unordered import unordered
+
+from hashtable import hashTable
 
 def test_should_pass():
     assert hashTable(max_capacity=100) is not None
@@ -16,15 +17,7 @@ def test_max_capacity_report():
     assert len(hashTable(max_capacity=100)) == 100
 
 def test_create_empty_value_slots():
-    # Given 
-    expected_vals = [BLANK, BLANK, BLANK]
-    hash_table = hashTable(max_capacity=3)
-
-    # When 
-    actual_vals = hash_table.values
-
-    # Then
-    assert actual_vals == expected_vals
+    assert hashTable(max_capacity=3)._pair == [None, None, None] # White-box testing
 
 def test_insert_keys_and_value_pairs():
     # Given
@@ -36,9 +29,9 @@ def test_insert_keys_and_value_pairs():
     hash_table[False] = True
 
     # Then
-    assert "Hello" in hash_table.values
-    assert 37 in hash_table.values
-    assert True in hash_table.values
+    assert ('Hola', 'Hello') in hash_table.pair
+    assert (98.6, 37) in hash_table.pair
+    assert (False, True) in hash_table.pair
 
     # Additional insertion for additional test
     assert len(hash_table) == 100
@@ -47,15 +40,9 @@ def test_table_should_not_contain_none_value_when_created():
     assert None not in hashTable(max_capacity=100).values
 
 def test_insert_none_value():
-    # Given
     hash_table = hashTable(max_capacity=100)
-    
-    # When
     hash_table['key'] = None
-    
-    # Then
-    assert None in hash_table.values
-
+    assert ('key', None) in hash_table.pair
 @pytest.fixture # Avoid duplicating same hashTable setup
 def hash_table():
     # Given
@@ -92,13 +79,65 @@ def test_should_get_none_when_key_missing(hash_table):
     assert hash_table.get('Missing_Key') is None
 
 def test_should_delete_key_value_pair(hash_table):
-    assert 'Hola' in hash_table
-    assert 'Hello' in hash_table.values
+    assert ('Hola', 'Hello') in hash_table.pair
 
     del hash_table['Hola']
 
-    assert 'Hola' not in hash_table
-    assert 'Hello' not in hash_table.values
+    assert 'Hello', 'Hola' not in hash_table.pair
 
     # Ensure Hash deletion does not shrink overall hash table
     assert len(hash_table) == 100
+
+def test_should_return_pairs(hash_table):
+    assert('Hola', 'Hello') in hash_table.pair
+    assert(98.6, 37) in hash_table.pair
+    assert (False, True) in hash_table.pair
+
+def test_should_return_copy_of_pairs(hash_table):
+    assert hash_table.pair is not hash_table.pair
+
+def test_should_not_include_blank_pairs(hash_table):
+    assert None not in hash_table.pair
+
+def test_should_return_duplicate_values():
+    hash_table = hashTable(max_capacity=100)
+    hash_table['Alice'] = 24
+    hash_table['Bob'] = 42
+    hash_table['Joe'] = 42
+    assert [24, 42, 42] == sorted(hash_table.values)
+
+# Won't take order into account when comparing 2 (or more) lists
+def test_should_get_unordered_values(hash_table):
+    assert unordered(hash_table.values) == ['Hello', 37, True]
+
+def test_should_get_values_of_empty_hash_table():
+    assert hashTable(max_capacity=100).values == []
+
+def test_should_return_copy_of_values(hash_table):
+    assert hash_table.values is not hash_table.values
+
+# Hash table's keys must be unique
+def test_should_get_keys(hash_table):
+    assert hash_table.keys == {'Hola', 98.6, False}
+
+def test_should_get_keys_of_empty_hash_table():
+    assert hashTable(max_capacity=100).keys == set() # No empty set literal in Python
+
+def test_should_return_copy_of_keys(hash_table):
+    assert hash_table.keys is not hash_table.keys
+
+def test_should_return_kv_pairs(hash_table):
+    assert hash_table.pair == {
+        ('Hola', 'Hello'),
+        (98.6, 37),
+        (False, True)
+    }
+
+def test_should_get_pairs_from_empty_hash_table():
+    assert hashTable(max_capacity=100).pair == set()
+
+def test_should_convert_to_dict(hash_table):
+    dictionary = dict(hash_table.pair)
+    assert set(dictionary.keys()) == hash_table.keys
+    assert set(dictionary.items()) == hash_table.pair
+    assert list(dictionary.values()) == unordered(hash_table.values)
