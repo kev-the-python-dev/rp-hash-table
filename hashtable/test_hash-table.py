@@ -18,6 +18,7 @@ def test_max_capacity_report():
 def test_create_empty_value_slots():
     assert hashTable(max_capacity=3)._pair == [None, None, None] # White-box testing
 
+# Key: Value Insertion
 def test_insert_keys_and_value_pairs():
     # Given
     hash_table = hashTable(max_capacity=100)
@@ -58,6 +59,7 @@ def test_should_find_value_in_key(hash_table):
     assert hash_table[98.6] == 37
     assert hash_table[False] is True
 
+# Finding Values by Key
 def test_should_raise_error_on_missing_key():
     hash_table = hashTable(max_capacity=100)
     
@@ -77,6 +79,7 @@ def test_should_get_value(hash_table):
 def test_should_get_none_when_key_missing(hash_table):
     assert hash_table.get('Missing_Key') is None
 
+# Deleteing Key:Value Pairs
 def test_should_delete_key_value_pair(hash_table):
     assert ('Hola', 'Hello') in hash_table.pair
 
@@ -87,11 +90,13 @@ def test_should_delete_key_value_pair(hash_table):
     # Ensure Hash deletion does not shrink overall hash table
     assert len(hash_table) == 2
 
+# Getting the Key:Value Pairs
 def test_should_return_pairs(hash_table):
     assert('Hola', 'Hello') in hash_table.pair
     assert(98.6, 37) in hash_table.pair
     assert (False, True) in hash_table.pair
 
+# Defensive Copying
 def test_should_return_copy_of_pairs(hash_table):
     assert hash_table.pair is not hash_table.pair
 
@@ -115,7 +120,7 @@ def test_should_get_values_of_empty_hash_table():
 def test_should_return_copy_of_values(hash_table):
     assert hash_table.values is not hash_table.values
 
-# Hash table's keys must be unique
+# Tests to ensure hash table keys are unique
 def test_should_get_keys(hash_table):
     assert hash_table.keys == {'Hola', 98.6, False}
 
