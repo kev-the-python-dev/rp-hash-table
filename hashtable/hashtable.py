@@ -49,12 +49,6 @@ class hashTable:
         else:
             return True
 
-    def get(self, key, default=None):
-        try:
-            return self[key]
-        except KeyError:
-            return default
-
     def __delitem__(self, key):
         # Taking advantage of mutator method
         if key in self:
@@ -76,6 +70,14 @@ class hashTable:
         cls = self.__class__.__name__ # Avoiding hard-coded name incase class needs to be renamed
         return f'{cls}.from_dict({str(self)})'
     
+    # So hash table is equal to itself, its copy, or another instance with same k/v pairs
+    def __eq__(self, other_table):
+        if self is other_table:
+            return True
+        if type(self) is not type(other_table):
+            return False
+        return set(self.pair) == set(other_table.pair)
+    
     # Don't remove otherwise copies may just be references to same object vs. their own object
     @property
     def values(self):
@@ -96,4 +98,12 @@ class hashTable:
     def _index(self, key):
         return hash(key) % self.capacity
 
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
+    def copy(self):
+        return hashTable.from_dict(dict(self.pair), self.capacity)
     
