@@ -7,14 +7,13 @@
 
 import pytest
 from pytest_unordered import unordered
-
 from hashtable import hashTable
 
 def test_should_pass():
     assert hashTable(max_capacity=100) is not None
 
 def test_max_capacity_report():
-    assert len(hashTable(max_capacity=100)) == 100
+    assert len(hashTable(max_capacity=100)) == 0
 
 def test_create_empty_value_slots():
     assert hashTable(max_capacity=3)._pair == [None, None, None] # White-box testing
@@ -29,12 +28,12 @@ def test_insert_keys_and_value_pairs():
     hash_table[False] = True
 
     # Then
-    assert ('Hola', 'Hello') in hash_table.pair
-    assert (98.6, 37) in hash_table.pair
-    assert (False, True) in hash_table.pair
+    assert ('Hola', 'Hello') in hash_table._pair
+    assert (98.6, 37) in hash_table._pair
+    assert (False, True) in hash_table._pair
 
     # Additional insertion for additional test
-    assert len(hash_table) == 100
+    assert len(hash_table) == 3
 
 def test_table_should_not_contain_none_value_when_created():
     assert None not in hashTable(max_capacity=100).values
@@ -86,7 +85,7 @@ def test_should_delete_key_value_pair(hash_table):
     assert 'Hello', 'Hola' not in hash_table.pair
 
     # Ensure Hash deletion does not shrink overall hash table
-    assert len(hash_table) == 100
+    assert len(hash_table) == 2
 
 def test_should_return_pairs(hash_table):
     assert('Hola', 'Hello') in hash_table.pair
@@ -141,3 +140,73 @@ def test_should_convert_to_dict(hash_table):
     assert set(dictionary.keys()) == hash_table.keys
     assert set(dictionary.items()) == hash_table.pair
     assert list(dictionary.values()) == unordered(hash_table.values)
+
+# Hash table length
+def test_should_report_length_of_empty_hash_table():
+    assert len(hashTable(max_capacity=100)) == 0
+
+def test_should_not_create_hashtable_with_zero_capacity():
+    with pytest.raises(ValueError):
+        hashTable(max_capacity=0)
+
+def test_should_not_create_hash_table_with_negative_capacity():
+    with pytest.raises(ValueError):
+        hashTable(max_capacity=-100)
+
+def test_should_report_length(hash_table):
+    assert len(hash_table) == 3
+
+def test_should_report_capacity_of_empty_hash_table():
+    assert hashTable(max_capacity=100).capacity == 100
+
+def test_should_report_capcity(hash_table):
+    assert hash_table.capacity == 100
+
+# Making Hash Table Iterable
+def test_should_iterate_over_keys(hash_table):
+    for key in hash_table.keys:
+        assert key in ('Hola', 98.6, False)
+
+def test_should_iterate_over_values(hash_table):
+    for value in hash_table.values:
+        assert value in ('Hello', 37, True)
+
+def test_should_iterate_over_pairs(hash_table):
+    for key, val in hash_table.pair:
+        assert key in hash_table.keys
+        assert val in hash_table.values
+
+def test_should_iterate_over_hashTable_instance(hash_table):
+    for key in hash_table:
+        assert key in ('Hola', 98.6, False)
+
+# Hash Table Text Representation
+def test_should_use_literal_for_str(hash_table):
+    assert str(hash_table) in {
+        '{\'Hola\': \'Hello\', 98.6: 37, False: True}',
+        '{\'Hola\': \'Hello\', False: True, 98.6: 37}',
+        '{98.6: 37, \'Hola\': \'Hello\', False: True}',
+        '{98.6: 37, False: True, \'Hola\': \'Hello\'}',
+        '{False: True, \'Hola\': \'Hello\', 98.6: 37}',
+        '{False: True, 98.6: 37, \'Hola\': \'Hello\'}',
+    }
+
+def test_should_create_hash_table_from_dict():
+    dictionary = {'Hola': 'Hello', 98.6: 37, False: True}
+
+    hash_table = hashTable.from_dict(dictionary)
+
+    assert hash_table.capacity == len(dictionary) * 10
+    assert hash_table.keys == set(dictionary.keys())
+    assert hash_table.pair == set(dictionary.items())
+    assert unordered(hash_table.values) == list(dictionary.values())
+
+def test_should_have_canonical_string_representation(hash_table):
+    assert repr(hash_table) in {
+        'hashTable.from_dict({\'Hola\': \'Hello\', 98.6: 37, False: True})',
+        'hashTable.from_dict({\'Hola\': \'Hello\', False: True, 98.6: 37})',
+        'hashTable.from_dict({98.6: 37, \'Hola\': \'Hello\', False: True})',
+        'hashTable.from_dict({98.6: 37, False: True, \'Hola\': \'Hello\'})',
+        'hashTable.from_dict({False: True, \'Hola\': \'Hello\', 98.6: 37})',
+        'hashTable.from_dict({False: True, 98.6: 37, \'Hola\': \'Hello\'})',
+    }
